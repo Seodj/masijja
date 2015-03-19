@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <script>
+        //localStorage.clear();
+        var date = new Date();
+        if(localStorage.getItem('key')==null){
+            location.href = "./join.html"
+        }
+        else{
+            if(date.getHours() > 11){
+                alert("열두시 지났다");
+                location.href = "./result.html"
+            } else {
+                location.href = "./choiceFood.html";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello</title>
+    <!-- BootStrap core CSS -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!--Jquery-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <style type="text/css">
+        html, body{height:100%;}
+        #foodImage{
+            width: 80%;
+            height: 20%;
+            position: relative;
+            top: 0;
+            left: 0;
+        }
+        p{
+            text-align: center;
+        }
+    </style>
+
+
+</head>
+
+<body>
+<div id="wrap" class="container">
+    <div class="row">
+        <header>
+            <div class="col-md-10">
+                    <div class="col-xs-9">
+                        <img src="./images/mainImage.JPG" width="50%"/>
+                    </div>
+                    <div class="col-xs-3">
+                        <ul class="nav navbar-nav">
+                            <li><a href="./choiceFood.html">홈</a></li>
+                            <li><a href="./insertFood.html">음식 추가</a></li>
+                        </ul>
+                </div>
+
+            </div>
+        </header>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-10">
+                <div class="panel">
+                    <div class="panel-body">
+                            <!-- 2. Create a matching tab pane for each tab. Content goes within these panes -->
+                            <div class="tab-content">
+                                <div style="position: relative; left: 0; top: 0;">
+                                    <p><img id="foodImage" src="http://cfile29.uf.tistory.com/image/021801345173B9FB16B196"/>
+                                    <h3><div id = "foodComment" style="position:absolute; top: 80%; left:40%;">
+                                        마음껏 시키게
+                                    </div></h3></p>
+                                </div>
+                                <div ng-app="" ng-controller="namesController">
+                                    <div class="tab-pane">
+                                        <p>
+                                            <input type="text" class="form-control" ng-model="foodName" placeholder="메뉴 검색">
+                                        </p>
+                                        <b ng-repeat="food in foods | filter:foodName">
+                                            <a href="" ng-click="foodSelect(this)" ng-model="foodForm.foodid"> {{ (food.name)}} </a> &nbsp;
+                                        </b>
+                                    </div>
+                                </div>
+                             </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function namesController($scope,$http) {
+       var ajaxHost = "http://10.67.72.121:3000/";
+        
+        $.ajax({url: ajaxHost + "foods"
+            , crossDomain: true
+            , dataType: "jsonp"
+            , type: 'GET'
+        }).success(function(food) {
+            $scope.foods = food;
+            $scope.$apply();
+        }).error(function(food) {
+           console.log('foods name call fail');
+        });
+
+       /*
+        $http.get("http://localhost:3000/foods")
+                 .success(function(response) { $scope.foods = response;
+          console.log($scope.foods);})
+                 .error(function(data) {
+                         console.log('Error: ' + data);
+                 });
+        
+        $scope.foodSelect = function(data) {
+            $scope.foodid = data.food._id;
+            $.ajax({url: ajaxHost + "users/food/" + localStorage.getItem('_id')
+                , crossDomain: true
+                , dataType: "jsonp"
+                , data: { foodid: data.food._id }
+                , type: 'PUT'
+            }).success(function(response) {
+                $('#foodImage').attr('src', data.food.thumbnail);
+                $('#foodComment').text(data.food.description);
+            }).error(function(data) {
+                console.log('Error: ' + data);
+            });
+        };*/
+    }
+</script>
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+</body>
+</html>

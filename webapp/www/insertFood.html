@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello</title>
+    <!-- BootStrap core CSS -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!--Jquery-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+</head>
+
+<body>
+<div id="wrap" class="container">
+    <div class="row">
+        <header>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <img src="./images/mainImage.JPG" width="50%"/>
+                    </div>
+                    <div class="col-xs-3">
+                        <ul class="nav navbar-nav">
+                            <li><a href="./choiceFood.html">홈</a></li>
+                            <li><a href="./insertFood.html">음식 추가</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">음식</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="foodArea">
+
+                            <!-- 2. Create a matching tab pane for each tab. Content goes within these panes -->
+                            <div class="tab-content">
+                                <div ng-app="" ng-controller="foodController">
+                                    <div class="tab-pane">
+                                        <form id="imageForm" method="post" enctype="multipart/form-data" action="http://localhost:3001/upload">
+                                            음식이름 : <input type="text" id="foodname" class="form-control" ng-model="formData.name"/> <br>
+                                            Thumbnail :
+                                                <img id="_thumb" src="">
+                                                <input type="hidden" id="srcvalue"/>
+    <input type="file" name="thumbnail" accept="image/*" onchange="fileChanged(this)"><br>
+                                            Description :  <input type="text" id="description" class="form-control" ng-model="formData.description"/> <br>
+                                            <p id="errorArea" style="display: none">정보를 모두 입력해주세요.</p>
+                                            <input type="submit" value="보내기" class="btn btn-primary" ng-click="insertFood()"/>
+                                        </form>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function foodController($scope,$http) {
+        var ajaxHost = "http://localhost:3001/";
+        $scope.insertFood = function() {
+            $scope.formData.thumbnail = document.getElementById('srcvalue').value;
+            if(document.getElementById('foodname').value=="" || document.getElementById('description').value=="" ){
+                $('#errorArea').css("display","block");
+                return ;
+            }
+            $http.post(ajaxHost + 'foods', $scope.formData)
+                    .success(function(data){
+                        $scope.formData = {};
+                        location.href="./choiceFood.html"
+                    })
+                    .error(function(data) {
+                        console.log($scope.formData);
+                        console.log('Error: ' + data);
+                    });
+        };
+    }
+    function fileChanged(fileInput) {
+        var targetFile = fileInput.files[0];
+        console.log(targetFile);
+        if(targetFile.type.search('gif') > -1) {
+            alert('no gif');
+            fileInput.value='';
+            return;
+        }
+        thumbnailUpload(fileInput.files[0], function(params){
+            $("#_thumb").attr('src', params.thumbnail);
+            $('#srcvalue').attr('value',params.thumbnail);
+        });
+    }
+    function thumbnailUpload(thumbnail, callback) {
+        var ajaxHost = 'http://localhost:3001';
+        var formData = new FormData();
+        formData.append('thumbnail', thumbnail);
+
+        $.ajax({
+            url: ajaxHost + '/upload/thumb',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data){
+                console.log(data);
+                callback(data);
+            }
+        });
+    }
+</script>
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+</body>
+</html>

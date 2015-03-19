@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myPage</title>
+    <!-- BootStrap core CSS -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!--Jquery-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+</head>
+
+<body>
+<div id="wrap" class="container" ng-app="">
+    <div class="row">
+       <div class="well">
+            myPage
+       </div>
+       <div ng-controller="myPageController">
+        <form id="imageForm" method="post" enctype="multipart/form-data" action="http://localhost:3001/upload">
+            이름 : <input type="text" id="userName" class="form-control" ng-model="formData.name" value="{{mypage.name}}" placeholder="Enter your name"/><br>
+            설명 : <input type="text" id="userComments" class="form-control" ng-model="formData.comments" value="{{mypage.comments}}" placeholder="Enter comment"/><br>
+            <p id="emptyName" style="display:none">이름을 입력해주세요.</p>
+            사진 : <br>
+            <img id="_thumb" src="{{mypage.thumbnail}}" width="40%">
+            <input type="hidden" id="srcvalue" value="{{mypage.thumbnail}}"/>
+            <input type="file" name="thumbnail" accept="image/*" onchange="fileChanged(this)"><br>
+            <input type="button" id="changeInfoButton" value="확인" class="btn btn-primary" ng-click="submitInfo(this)" />
+            <input type="button" id="" value="reset" class="btn btn-primary"/>
+        </form>
+       </div>
+    </div>
+</div>
+<script>
+    function myPageController($scope, $http){
+        var ajaxHost = "http://localhost:3001/";
+
+        $http.get(ajaxHost + 'users/' + localStorage.getItem('_id'))
+        .success(function(response){
+            $scope.mypage=response;
+        })
+        .error(function(data){
+            console.log('Error: ' + data);
+        });
+
+        $scope.submitInfo = function(data){
+            if(!document.getElementById("userName").value){
+                $('#emptyName').css("display","block");
+                return;
+            }
+            
+            $scope.formData = {
+                name: document.getElementById("userName").value, 
+                comments: document.getElementById("userComments").value,
+                thumbnail: document.getElementById("srcvalue").value
+            };
+
+            $http.put(ajaxHost + 'users/' + localStorage.getItem('_id'), $scope.formData)
+            .success(function(data){
+                console.log(data);
+            })
+            .error(function(data){
+                console.log('Error: ' + data);
+            });
+        }
+    }
+    function fileChanged(fileInput) {
+        var targetFile = fileInput.files[0];
+        console.log(targetFile);
+        if(targetFile.type.search('gif') > -1) {
+            alert('no gif');
+            fileInput.value='';
+            return;
+        }
+        thumbnailUpload(fileInput.files[0], function(params){
+            $("#_thumb").attr('src', params.thumbnail);
+            $('#srcvalue').attr('value',params.thumbnail);
+        });
+    }
+    function thumbnailUpload(thumbnail, callback) {
+        var ajaxHost = 'http://localhost:3001';
+        var formData = new FormData();
+        formData.append('thumbnail', thumbnail);
+
+        $.ajax({
+            url: ajaxHost + '/upload/thumb',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data){
+                console.log(data);
+                callback(data);
+            }
+        });
+    }
+
+</script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>
+</body>
+</html>

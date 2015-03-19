@@ -1,0 +1,4 @@
+*.apk
+*.log
+node_modules
+server/files/image/*

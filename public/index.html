@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> eat ass MEAN </title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script type="text/javascript" src="http://malsup.github.com/min/jquery.form.min.js"></script>
+
+</head>
+<body>
+HELLO MEAN!!!! ass hhhh
+<form id="imageForm" method="post" enctype="multipart/form-data" action="http://localhost:3001/upload">
+	<img id="_thumb" src="">
+    <input type="file" name="thumbnail" accept="image/*" onchange="fileChanged(this)">
+</form>
+<a href="javascript:upload()">asdfasdfasdf</a>
+</body>
+<script src="./index.js"></script>
+<script type="text/javascript">
+function fileChanged(fileInput) {
+	var targetFile = fileInput.files[0];
+	console.log(targetFile);
+	if(targetFile.type.search('gif') > -1) {
+		alert('no gif');
+		fileInput.value='';
+		return;
+	}
+	thumbnailUpload(fileInput.files[0], function(params){
+		console.log("123");
+		$("#_thumb").attr('src', params.thumbnail);
+	});
+}
+function thumbnailUpload(thumbnail, callback) {
+	var ajaxHost = 'http://localhost:3001';
+	var formData = new FormData();
+	formData.append('thumbnail', thumbnail);
+
+	$.ajax({
+		url: ajaxHost + '/upload/thumb',
+		data: formData,
+		processData: false,
+		contentType: false,
+		type: 'POST',
+		success: function(data){
+			console.log(data);
+			callback(data);
+		}
+	});
+}
+</script>
+</html>
