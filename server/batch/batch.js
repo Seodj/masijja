@@ -3,8 +3,6 @@ var User = require('../models/user');
 var Group = require('../models/group');
 var Food = require('../models/food');
 var GroupResult = require('../models/groupresult');
-var deepPopulate = require('mongoose-deep-populate');
-Group.schema.plugin(deepPopulate);
 
 mongoose.connect('mongodb://localhost/masijja');
 
@@ -61,7 +59,7 @@ function choiceGroupFood(group) {
 	return result;
 }
 
-var promise = Group.find().lean().deepPopulate('users').exec();
+var promise = Group.find().populate('users').exec();
 promise.then(function(groups){
 	var resultTable = [];
 	groups.forEach(function(group) {
@@ -69,31 +67,28 @@ promise.then(function(groups){
 		resultTable.push(result);
 	});
 
-	//console.log(resultTable);
 	// 저장
-
+	var resultCount = resultTable.length;
+	var todayfoodCount = resultTable.length;
 	for(var index in resultTable){
 		var groupresult = new GroupResult(resultTable[index]);
-		console.log(groupresult);
 
 		groupresult.save(function(err, result) {
-			if(err) {
-				console.log(err);
-				return err;
+			resultCount--;
+			if ( resultCount <= 0 && todayfoodCount <= 0) {
+				console.log('batch end');
+				process.exit(0);
 			}
-			console.log(result);
 		});
 
 		Group.findOneAndUpdate({_id: resultTable[index].groupid},{todayfood: resultTable[index].todayfood}, function(err,todayfood){
-			if(err) {
-				console.log(err);
-				return err;
+			todayfoodCount--;
+			if ( resultCount <= 0 && todayfoodCount <= 0) {
+				console.log('batch end');
+				process.exit(0);
 			}
-			console.log(todayfood);
-		})
+		});
 	}
-
-
 	
 });
 

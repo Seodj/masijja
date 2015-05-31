@@ -7,7 +7,6 @@ router.get('/', function(req, res, next) {
 		if(err) {
 			return next(err);
 		}
-		console.log(foods);
 		res.send(foods);
 	});
 });

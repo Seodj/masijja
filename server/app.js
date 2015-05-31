@@ -34,6 +34,8 @@ app.use('/foods', require('./routes/food'));
 app.use('/access', require('./routes/accessinfo'));
 app.use('/mock', require('./routes/mock'));
 app.use('/upload', require('./routes/upload'));
+app.use('/updateresult', require('./routes/updateresult'));
+app.use('/restaurants', require('./routes/restaurant'));
 
 var server = app.listen(3001, function() {
   mongoose.connect('mongodb://localhost/masijja');

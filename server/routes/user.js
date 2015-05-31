@@ -59,8 +59,32 @@ router.get('/:_id', function(req, res, next){
       return next(err);
     }
     res.send(user);
+	console.log(user);
   })
-})
+});
+
+router.get('/findkey/:key', function(req, res, next){
+  if (!req.params.key) {
+    res.send({isValidKey: false});
+  }
+  else{
+    var key = req.params.key;
+    console.log(key);
+    User.find({keys : key}, function(err, user){
+      if (err) {
+        return next(err);
+      }
+      if ( user == "") {
+        console.log("user not exist");
+        res.send({isValidKey: false});
+      } else {
+        console.log(user);
+        console.log("user exist");
+        res.send({isValidKey: true});
+      }
+    });
+  }
+});
 
 router.put('/:_id', function(req, res, next){
   var user = {
@@ -121,6 +145,22 @@ router.get('/todayfood/:_id', function(req, res){
   		});
   	}
   })
+});
+
+router.put('/deleteTodayFood/:_id', function(req, res, next){
+  if (!req.params._id) {
+    console.log("no user id");
+    return;
+  }
+
+  var userid = req.params._id;
+  User.findByIdAndUpdate(userid, {$unset: {todayfood: ""}}, function(err, user){
+      if (err) {
+        return next(err);
+      }
+      console.log(user);
+      res.send(user);
+  });
 });
 
 module.exports = router;

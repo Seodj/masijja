@@ -14,7 +14,8 @@ router.post('/thumb', function(req, res, next) {
     fileUpload(req, res, next, function(req, res, next) {
         gm(req.body.thumbnail)
         .noProfile()
-        .gravity('Center')
+        .resize(100,100)
+        .autoOrient()
         .thumb(thumbSize, thumbSize, req.body.thumbnail,90, function(err){
             if(err) {
                 return next(err);

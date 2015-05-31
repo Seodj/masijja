@@ -56,10 +56,10 @@ function choiceGroupFood(group) {
 }
 
 function updateGroupResult(groupresult){
-	GroupResult.findOneAndUpdate({groupid: groupresult.groupid}, {$set : {result : groupresult.result}} ,function(err, result, next) {
+	GroupResult.update({groupid: groupresult.groupid}, {$set : {result : groupresult.result}} , {upsert :true}, function(err, result, next) {
 		if(err) {
 			console.log(err);
-			return next(new Error(err));
+			return;
 		}
 		console.log(result);
 	});
@@ -69,25 +69,37 @@ function addGroupResult(groupresult){
 	groupresult.save(function(err, result, next) {
 		if(err) {
 			console.log(err);
-			return next(new Error(err));
+			return;
 		}
 		console.log(result);
 	});
 }
 
 function updateTodayFood(resultTable){
-	Group.findOneAndUpdate({_id: resultTable.groupid},{todayfood: resultTable.todayfood}, function(err,todayfood,next){
-		if(err) {
-			console.log(err);
-			return next(new Error(err));
-		}
-			console.log(todayfood);
-	});
+	if(resultTable.todayfood){
+		Group.update({_id : resultTable.groupid}, {$set : {todayfood: resultTable.todayfood}}, {upsert :true}, function(err,todayfood,next){
+			if(err) {
+				console.log(err);
+				return;
+			}
+				console.log("update todayfood");
+		});
+	}
+	else{
+		Group.update({_id : resultTable.groupid}, {$unset : {todayfood: ""}}, {upsert :true}, function(err,todayfood,next){
+			if(err) {
+				console.log(err);
+				return;
+			}
+				console.log("no todayfood");
+		});	
+	}
 }
 
 router.put('/:_id', function(req, res, next){
 	if (!req.params._id) {
-    	return next(new Error('invalid params'));
+    	console.log('invalid params');
+    	return;
   	}
   	var groupid = req.params._id;
 
@@ -100,28 +112,27 @@ router.put('/:_id', function(req, res, next){
 
 		// update
 		var groupresult = new GroupResult(resultTable[0]);
+		console.log("update result = " + groupresult);
 
 		GroupResult.findOne({groupid: groupresult.groupid}, function(err,result,next){
 			if(err){
-				return next(new Error(err));
+				console.log(err);
+    			return;
 			}
 
 			if(result){
 				console.log('update groupresult');
 				updateGroupResult(groupresult);
-			} else {
+			} else{
 				console.log('add groupresult');
 				addGroupResult(groupresult);
 			}
-			
+
+			updateTodayFood(resultTable[0]);
 		});
-
-		updateTodayFood(resultTable[0]);
 	});
-
+	console.log("update complete");
 	res.send("성공");
 });
 
 module.exports = router;
-
-//process.exit(0);

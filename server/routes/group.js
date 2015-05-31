@@ -60,17 +60,19 @@ router.put('/joinGroup/:_id', function(req, res, next) {
     }
     if (!group || group.code != code) {
       res.send({codeFlag : true});
-      return next(new Error('invalid code error'));
+      console.log("password fault");
+      return;
     }
-  });
-  Group.update({_id: groupId, users: { $ne : userId}, code: code}, {$push: {users: userId}},  function(err, group) {
-    if (err) {
-      return next(err);
-    }
-    if (!group) {
-      return next(new Error("update fail"));
-    }
-    res.send({group : group, flag : true});
+    Group.update({_id: groupId, users: { $ne : userId}, code: code}, {$push: {users: userId}},  function(err, group) {
+      if (err) {
+        return next(err);
+      }
+      if (!group) {
+        res.send({flag : false});
+        return;
+      }
+      res.send({group : group, flag : true});
+    });
   });
 });
 
@@ -86,7 +88,8 @@ router.put('/outGroup/:_id', function(req, res, next) {
       return next(err);
     }
     if (!group) {
-      return next(new Error("update fail"));
+      res.send({flag : false});
+      return;
     }
     res.send({group : group, flag : true});
   });
@@ -141,8 +144,12 @@ router.put('/deleteGroup/:_id', function(req, res, next){
   var groupId = req.params._id;
   var userId = req.body.userid;
   Group.remove({_id : groupId, admin: userId}, function(err, group){
-    if (err || !group) {
+    if (err) {
       return next(err);
+    }
+    if (!group) {
+      res.send({flag : false});
+      return;
     }
     res.send({group : group, flag : true});
   });
